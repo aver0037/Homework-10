@@ -1,0 +1,76 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {"url": "https://raw.githubusercontent.com/aver0037/DV2/refs/heads/main/data/DV2_Stream_Dataset.csv"},
+  "width": 425,
+  "params": [
+    {
+      "name": "Renewability_Selection",
+      "bind": {
+        "input": "select",
+        "options": [
+          null,
+          ["Black Coal", "Brown Coal", "Natural Gas", "Uranium", "Crude Oil"],
+          ["Hydro", "Solar", "Wind"] 
+        ],
+        "labels" :[
+          "Show All",
+          "Non-Renewable Energy",
+          "Renewable Energy"
+        ],
+        "name": " "
+      }
+    }
+  ],
+  "transform": [
+    {"filter": "Renewability_Selection == null || (isArray(Renewability_Selection) ? indexof(Renewability_Selection, datum.Type) >= 0 : datum.Type == Renewability_Selection)"},
+    {
+      "pivot": "Type",
+      "value": "Generated",
+      "groupby": ["Year"]
+    }
+  ],
+  "repeat": {
+    "layer": ["Black Coal", "Brown Coal", "Natural Gas", "Uranium", "Crude Oil","Hydro","Solar","Wind"]
+  },
+  "spec": {
+    "layer": [{
+      "mark": {"type": "line", "stroke": "white", "strokeWidth": 4},
+      "encoding": {
+        "x": {"field": "Year", "type": "temporal"},
+        "y": {"field": {"repeat": "layer"}, "type": "quantitative"}
+      }
+    },{
+      "mark": {"type": "line"},
+      "encoding": {
+        "x": {"field": "Year", "type": "temporal"},
+        "y": {"field": {"repeat": "layer"}, "type": "quantitative", "title": "Energy Generated (Petajoules)"},
+        "stroke": {"datum": {"repeat": "layer"}, "type": "nominal"}
+      }
+    },{
+      "mark": {"type": "point","fill": "white"},
+      "encoding": {
+        "x": {"field": "Year", "type": "temporal"},
+        "y": {"field": {"repeat": "layer"}, "type": "quantitative", "title": "Energy Generated (Petajoules)"},
+        "stroke": {"datum": {"repeat": "layer"}, "type": "nominal"},
+        "tooltip": [
+          {
+            "field": "Year",
+            "type": "temporal",
+            "title": "Year",
+            "format": "%Y"
+          },
+          {
+            "field": {
+              "repeat": "layer"
+            },
+            "type": "quantitative",
+            "title": "Energy Generated (Petajoules)",
+            "format": ","
+          }
+        ]
+      }
+    }
+  ]
+  },
+  "config": {}
+}
